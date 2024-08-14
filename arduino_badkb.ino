@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-#include <Keyboard.h>  // Include the Keyboard library
+#include <Keyboard.h>  
+#include <Mouse.h>
 
 LiquidCrystal_I2C lcd(0x3F, 16, 2);
 
@@ -15,6 +16,23 @@ int currentOption = 0;
 int lastOption = 0;
 int buttonState = LOW;
 int lastButtonState = LOW;
+
+const char* options[2] = {
+    "Auto Clicker 10x", "Open Notepad"
+};
+
+const displayOption() {
+    lcd.setCursor(0, 0);
+    lcd.clear();
+    lcd.print(options[currentOption]);
+}
+
+void autoClicker(int clicks) {
+  for (int i = 0; i < clicks; i++) {
+    Mouse.click();     // Simulates a left mouse button click
+    delay(100);        // Add a small delay between clicks (100ms)
+  }
+}
 
 void openNotePad() {
   // Open the Run dialog to launch Notepad
@@ -48,6 +66,8 @@ void setup() {
   pinMode(VRx, INPUT);
   lcd.setCursor(0, 0);
   lcd.print("Arduino BadKB");
+  delay(1000);
+  displayOption();
 }
 
 void loop() {
@@ -61,24 +81,28 @@ void loop() {
 
     if ((currentMillis - lastDebounceTime) > debounceDelay) {
       if (buttonState == LOW) {
-        Serial.println("Button pressed");
-        openNotePad();
-        delay(1000);
+        if(currentOption == 0) {
+          autoClicker(10);
+        }else if(currentOption == 1) {
+          openNotePad();
+        }
     }
   }
 
   if (joystickValueX < (joystickThreshold - 100)) { 
     currentOption++;
+    displayOption();
   }else if(joystickValueX > (joystickThreshold + 100) && currentOption > 0){
     currentOption--;
+    displayOption();
   }
 
-  if(currentOption > 0 && currentOption != lastOption) {
-     lastOption = currentOption;
-    lcd.setCursor(0, 0);
-    lcd.clear();
-    lcd.print(currentOption);
-  }
+  // if(currentOption > 0 && currentOption != lastOption) {
+  //    lastOption = currentOption;
+  //   lcd.setCursor(0, 0);
+  //   lcd.clear();
+  //   lcd.print(currentOption);
+  // }
 
   delay(500);
 }
