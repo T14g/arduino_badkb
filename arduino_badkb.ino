@@ -16,9 +16,10 @@ int currentOption = 0;
 int lastOption = 0;
 int buttonState = LOW;
 int lastButtonState = LOW;
+int scrollCount = 0;
 
-const char* options[2] = {
-    "Auto Clicker 10x", "Open Notepad"
+const char* options[3] = {
+    "Auto Clicker 10x", "Open Notepad", "Auto scroll"
 };
 
 const displayOption() {
@@ -57,6 +58,15 @@ void openNotePad() {
   Keyboard.write(KEY_RETURN);
 }
 
+void autoScroll() {
+  while(scrollCount < 300) {
+    Keyboard.press(KEY_DOWN_ARROW);
+    delay(100);  // Short press duration (in milliseconds)
+    Keyboard.10release(KEY_DOWN_ARROW);
+    scrollCount++;
+  }
+}
+
 void setup() {
   Serial.begin(9600);
   Keyboard.begin();
@@ -85,6 +95,8 @@ void loop() {
           autoClicker(10);
         }else if(currentOption == 1) {
           openNotePad();
+        }else if(currentOption == 2) {
+          autoScroll();
         }
     }
   }
